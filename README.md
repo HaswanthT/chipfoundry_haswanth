@@ -17,16 +17,7 @@ By offloading cryptographic operations to hardware, this design demonstrates **s
 ---
 
 ## 🔲 System Architecture  
-     graph TD
-    A[Microwatt CPU <br> (POWER ISA Core)] --> B[System Bus <br> (Wishbone/AXI-lite)]
-    B --> C[Crypto Accelerator <br> (AES-128)]
-    subgraph Crypto Accelerator
-        D[Key Expansion]
-        E[AES Rounds <br> (10x)]
-        F[FSM Controller]
-        G[Regs: CTRL, KEY, <br> DATA_IN/OUT]
-    end
-    C --> H[Encrypted/Decrypted Data]     
+     ![mermaid-diagram](https://github.com/user-attachments/assets/1e69cbd1-2742-4e6e-ab1d-ee447b0e415f)  
 
 
 ## 🛠️ Key Features  
