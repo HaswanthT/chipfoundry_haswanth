@@ -17,29 +17,16 @@ By offloading cryptographic operations to hardware, this design demonstrates **s
 ---
 
 ## 🔲 System Architecture  
-               ┌───────────────────┐
-         │   Microwatt CPU   │
-         │ (POWER ISA Core)  │
-         └─────────┬─────────┘
-                   │
-          ┌────────▼─────────┐
-          │  System Bus       │
-          │ (Wishbone/AXI-lite)│
-          └───────┬──────────┘
-                  │
-     ┌────────────▼────────────┐
-     │   Crypto Accelerator    │
-     │       (AES-128)         │
-     │ ┌─────────────────────┐ │
-     │ │ Key Expansion       │ │
-     │ │ AES Rounds (10x)    │ │
-     │ │ FSM Controller      │ │
-     │ │ Regs: CTRL, KEY,    │ │
-     │ │       DATA_IN/OUT   │ │
-     │ └─────────────────────┘ │
-     └────────────┬────────────┘
-                  │
-         Encrypted/Decrypted Data
+     graph TD
+    A[Microwatt CPU <br> (POWER ISA Core)] --> B[System Bus <br> (Wishbone/AXI-lite)]
+    B --> C[Crypto Accelerator <br> (AES-128)]
+    subgraph Crypto Accelerator
+        D[Key Expansion]
+        E[AES Rounds <br> (10x)]
+        F[FSM Controller]
+        G[Regs: CTRL, KEY, <br> DATA_IN/OUT]
+    end
+    C --> H[Encrypted/Decrypted Data]     
 
 
 ## 🛠️ Key Features  
