@@ -1,75 +1,72 @@
-# OpenFrame Overview
+# 🔐 Crypto Accelerator for Microwatt  
 
-The OpenFrame Project provides an empty harness chip that differs significantly from the Caravel and Caravan designs. Unlike Caravel and Caravan, which include integrated SoCs and additional features, OpenFrame offers only the essential padframe, providing users with a clean slate for their custom designs.
+## 📖 Project Overview  
+This project proposes a **hardware cryptographic accelerator** integrated with the open-source **Microwatt POWER CPU core**.  
+The accelerator will implement **AES-128 encryption/decryption** in Verilog, providing a **secure and high-performance solution** for open computing systems.  
 
-<img width="256" alt="Screenshot 2024-06-24 at 12 53 39 PM" src="https://github.com/efabless/openframe_timer_example/assets/67271180/ff58b58b-b9c8-4d5e-b9bc-bf344355fa80">
+By offloading cryptographic operations to hardware, this design demonstrates **significant performance improvements** compared to software-only implementations, while showcasing the flexibility of Microwatt as a foundation for custom extensions.  
 
-## Key Characteristics of OpenFrame
+---
 
-1. **Minimalist Design:** 
-   - No integrated SoC or additional circuitry.
-   - Only includes the padframe, a power-on-reset circuit, and a digital ROM containing the 32-bit project ID.
+## 🎯 Objectives  
+- Design and implement an **AES-128 crypto core in Verilog**.  
+- Provide a **Wishbone/AXI-lite memory-mapped interface** for Microwatt integration.  
+- Demonstrate secure and fast data encryption/decryption on Microwatt.  
+- Ensure the design is **open-source, reproducible, and SKY130-compatible**.  
 
-2. **Padframe Compatibility:**
-   - The padframe design and pin placements match those of the Caravel and Caravan chips, ensuring compatibility and ease of transition between designs.
-   - Pin types are identical, with power and ground pins positioned similarly and the same power domains available.
+---
 
-3. **Flexibility:**
-   - Provides full access to all GPIO controls.
-   - Maximizes the user project area, allowing for greater customization and integration of alternative SoCs or user-specific projects at the same hierarchy level.
+## 🔲 System Architecture  
+        Microwatt CPU
+             │
+     ┌───────▼────────┐
+     │   Bus (WB/AXI) │
+     └───────┬────────┘
+             │
+   ┌─────────▼───────────┐
+   │   Crypto Accelerator │
+   │   (AES-128 Core)     │
+   │   - Key Register     │
+   │   - Data Register    │
+   │   - FSM Controller   │
+   └─────────┬───────────┘
+             │
+   Encrypted / Decrypted Data
 
-4. **Simplified I/O:**
-   - Pins that previously connected to CPU functions (e.g., flash controller interface, SPI interface, UART) are now repurposed as general-purpose I/O, offering flexibility for various applications.
+---
 
-The OpenFrame harness is ideal for those looking to implement custom SoCs or integrate user projects without the constraints of an existing SoC.
+## 🛠️ Key Features  
+- **AES-128 Core in Verilog** (combinational + FSM-based design).  
+- **Memory-mapped registers** for key, input data, output data, and control.  
+- **NIST AES test vectors** used for functional verification.  
+- **FPGA + OpenLane flow compatibility** for reproducibility.  
+- Open-source under the **Apache 2.0 license**.  
 
-## Features
+---
 
-1. 44 configurable GPIOs.
-2. User area of approximately 15mm².
-3. Supports digital, analog, or mixed-signal designs.
+## 🧪 Verification & Testing  
+- **RTL Testbenches** using NIST official test vectors.  
+- **Integration with Microwatt** for CPU-controlled encryption/decryption.  
+- **Performance benchmarks** comparing hardware vs. software AES on Microwatt.  
 
-# openframe_timer_example
+---
 
-This example implements a simple timer and connects it to the GPIOs.
+## 📅 Timeline  
+- **Phase 1 (Sep 22 – Sep 30):** AES core design in Verilog.  
+- **Phase 2 (Oct 1 – Oct 14):** FSM + memory-mapped interface integration.  
+- **Phase 3 (Oct 15 – Oct 28):** RTL testbench + functional verification.  
+- **Phase 4 (Oct 29 – Nov 3):** Microwatt integration + demo + documentation.  
 
-## Installation and Setup
+---
 
-First, clone the repository:
+## 📂 Deliverables  
+- Verilog RTL source code for AES-128 core and bus interface.  
+- Testbenches and verification results.  
+- Documentation (design flow, block diagrams, usage guide).  
+- Final demo video and reproducible GitHub repo.  
 
-```bash
-git clone https://github.com/efabless/openframe_timer_example.git
-cd openframe_timer_example
-```
+---
 
-Then, download all dependencies:
+## 📜 License  
+This project will be released under the **Apache 2.0 License**, ensuring open-source availability and reuse.  
 
-```bash
-make setup
-```
-
-## Hardening the Design
-
-In this example, we will harden the timer. You will need to harden your own design similarly.
-
-```bash
-make user_proj_timer
-```
-
-Once you have hardened your design, integrate it into the OpenFrame wrapper:
-
-```bash
-make openframe_project_wrapper
-```
-
-## Important Notes
-
-1. **Connecting to Power:**
-   - Ensure your design is connected to power using the power pins on the wrapper.
-   - Use the `vccd1_connection` and `vssd1_connection` macros, which contain the necessary vias and nets for power connections.
-
-2. **Flattening the Design:**
-   - If you plan to flatten your design within the `openframe_project_wrapper`, do not buffer the analog pins using standard cells.
-
-3. **Running Custom Steps:**
-   - Execute the custom step in OpenLane that copies the power pins from the template DEF. If this step is skipped, the precheck will fail, and your design will not be powered.
