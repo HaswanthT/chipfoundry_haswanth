@@ -17,18 +17,30 @@ By offloading cryptographic operations to hardware, this design demonstrates **s
 ---
 
 ## 🔲 System Architecture  
-       flowchart LR
-    CPU[Microwatt CPU\n(POWER ISA Core)]
-    BUS[System Bus\n(Wishbone/AXI-lite)]
-    ACCEL[Crypto Accelerator\n(AES-128 Core)]
-    SUB1[Key Expansion]
-    SUB2[AES Rounds\n(SubBytes, ShiftRows, MixColumns)]
-    SUB3[FSM Controller]
-    SUB4[Registers\nCTRL, KEY, DATA_IN, DATA_OUT]
+               ┌───────────────────┐
+         │   Microwatt CPU   │
+         │ (POWER ISA Core)  │
+         └─────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │  System Bus       │
+          │ (Wishbone/AXI-lite)│
+          └───────┬──────────┘
+                  │
+     ┌────────────▼────────────┐
+     │   Crypto Accelerator    │
+     │       (AES-128)         │
+     │ ┌─────────────────────┐ │
+     │ │ Key Expansion       │ │
+     │ │ AES Rounds (10x)    │ │
+     │ │ FSM Controller      │ │
+     │ │ Regs: CTRL, KEY,    │ │
+     │ │       DATA_IN/OUT   │ │
+     │ └─────────────────────┘ │
+     └────────────┬────────────┘
+                  │
+         Encrypted/Decrypted Data
 
-    CPU --> BUS --> ACCEL
-    ACCEL --> SUB1 & SUB2 & SUB3 & SUB4
-    ACCEL --> OUT[Encrypted / Decrypted Data]
 
 ## 🛠️ Key Features  
 - **AES-128 Core in Verilog** (combinational + FSM-based design).  
