@@ -17,8 +17,7 @@ By offloading cryptographic operations to hardware, this design demonstrates **s
 ---
 
 ## 🔲 System Architecture  
-     ![mermaid-diagram](https://github.com/user-attachments/assets/1e69cbd1-2742-4e6e-ab1d-ee447b0e415f)  
-
+   <img width="754" height="360" alt="Screenshot 2025-09-22 231509" src="https://github.com/user-attachments/assets/3601bb44-49ab-4eec-9ed2-eb719a89ed6c" />
 
 ## 🛠️ Key Features  
 - **AES-128 Core in Verilog** (combinational + FSM-based design).  
