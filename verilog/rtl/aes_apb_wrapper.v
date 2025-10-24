@@ -3,7 +3,7 @@
 // License: Apache-2.0
 `timescale 1ns/1ps
 
-module aes_apb_wrapper (
+module aes_apb_wrapper(
     input  wire        PCLK,
     input  wire        PRESETn,
     input  wire [31:0] PADDR,
