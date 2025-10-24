@@ -2,7 +2,7 @@
 // MixColumns helper and xtime (Galois multiply by 2)
 // License: Apache-2.0
 
-module aes_mixcol (
+module aes_gf (
     input  wire [7:0] a,
     output wire [7:0] xtime_a
 );
@@ -25,4 +25,3 @@ assign col_out[23:16] = a0 ^ xa1 ^ (a2 ^ xa2) ^ a3;
 assign col_out[15:8]  = a0 ^ a1 ^ xa2 ^ (a3 ^ xa3);
 assign col_out[7:0]   = (a0 ^ xa0) ^ a1 ^ a2 ^ xa3;
 endmodule
-
