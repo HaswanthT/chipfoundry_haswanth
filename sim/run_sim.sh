@@ -1,47 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# auto-detect locations
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 RTL_DIR="$PROJECT_ROOT/rtl"
 TB_DIR="$PROJECT_ROOT/tb"
 SIM_DIR="$SCRIPT_DIR"
 
-echo "🧰 Running Verilator simulation (verilator + vvp)"
+echo "🧰 Running Icarus Verilog simulation (iverilog/vvp)"
 echo "Project root: $PROJECT_ROOT"
 
 # cleanup
-rm -f "$SIM_DIR"/aes_wave.vcd "$SIM_DIR"/verilator.log || true
+rm -f "$SIM_DIR"/aes_wave.vcd "$SIM_DIR"/aes_tb.vvp || true
 rm -rf obj_dir || true
 
-# Verilator compile (treat tb/aes_tb.v as top module)
-echo "🔧 Verilator: compiling..."
-verilator --cc --exe --build \
-  --MMD --trace \
-  -I"$RTL_DIR" \
+# compile
+echo "🔧 Compiling Verilog files..."
+iverilog -g2012 -o "$SIM_DIR/aes_tb.vvp" \
   "$RTL_DIR/aes_sbox.v" \
   "$RTL_DIR/aes_mixcol.v" \
   "$RTL_DIR/aes_keyexp.v" \
   "$RTL_DIR/aes_core.v" \
   "$RTL_DIR/aes_fsm.v" \
   "$RTL_DIR/aes_apb_wrapper.v" \
-  "$TB_DIR/aes_tb.v" \
-  -o obj_dir/Vaes_tb 2>&1 | tee "$SIM_DIR/verilator.log"
+  "$TB_DIR/aes_tb.v"
 
 # run
 echo "▶️ Running simulation..."
-./obj_dir/Vaes_tb
+vvp "$SIM_DIR/aes_tb.vvp"
 
-# waveform
-if [ -f "$SIM_DIR"/aes_wave.vcd ]; then
-  if command -v gtkwave >/dev/null 2>&1; then
-    echo "📈 Opening waveform (aes_wave.vcd)..."
-    gtkwave "$SIM_DIR/aes_wave.vcd" &
-  else
-    echo "🛈 GTKWave not found. Open $SIM_DIR/aes_wave.vcd with your viewer."
-  fi
+# show waveform if available
+if command -v gtkwave >/dev/null 2>&1; then
+  echo "📈 Opening waveform (aes_wave.vcd)..."
+  gtkwave "$SIM_DIR/aes_wave.vcd" &
 else
-  echo "⚠️ aes_wave.vcd not found."
+  echo "🛈 GTKWave not found. Open $SIM_DIR/aes_wave.vcd with your viewer."
 fi
 
-echo "✅ Verilator simulation finished. See $SIM_DIR/verilator.log for details."
+echo "✅ Simulation finished."
