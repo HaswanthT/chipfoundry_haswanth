@@ -1,26 +1,41 @@
-#!/bin/bash
-# run_sim.sh - simple Icarus Verilog simulation script
-# assumes rtl/ and tb/ directories at repo root
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
+# auto-detect locations
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+RTL_DIR="$PROJECT_ROOT/rtl"
+TB_DIR="$PROJECT_ROOT/tb"
+SIM_DIR="$SCRIPT_DIR"
 
-RTL_DIR=../rtl
-TB_DIR=../tb
+echo "🧰 Running Icarus Verilog simulation (iverilog/vvp)"
+echo "Project root: $PROJECT_ROOT"
 
-# change into sim directory
-cd "$(dirname "$0")"
+# cleanup
+rm -f "$SIM_DIR"/aes_wave.vcd "$SIM_DIR"/aes_tb.vvp || true
+rm -rf obj_dir || true
 
-# build with iverilog
-echo "Compiling..."
-iverilog -g2012 -o aes_tb.vvp $RTL_DIR/aes_sbox.v $RTL_DIR/aes_mixcol.v $RTL_DIR/aes_keyexp.v $RTL_DIR/aes_core.v $RTL_DIR/aes_fsm.v $RTL_DIR/aes_apb_wrapper.v $TB_DIR/aes_tb.v
+# compile
+echo "🔧 Compiling Verilog files..."
+iverilog -g2012 -o "$SIM_DIR/aes_tb.vvp" \
+  "$RTL_DIR/aes_sbox.v" \
+  "$RTL_DIR/aes_mixcol.v" \
+  "$RTL_DIR/aes_keyexp.v" \
+  "$RTL_DIR/aes_core.v" \
+  "$RTL_DIR/aes_fsm.v" \
+  "$RTL_DIR/aes_apb_wrapper.v" \
+  "$TB_DIR/aes_tb.v"
 
-echo "Running simulation..."
-vvp aes_tb.vvp
+# run
+echo "▶️ Running simulation..."
+vvp "$SIM_DIR/aes_tb.vvp"
 
-# show waveform (if GTKWave available)
+# show waveform if available
 if command -v gtkwave >/dev/null 2>&1; then
-  echo "Opening waveform..."
-  gtkwave aes_wave.vcd &
+  echo "📈 Opening waveform (aes_wave.vcd)..."
+  gtkwave "$SIM_DIR/aes_wave.vcd" &
 else
-  echo "GTKWave not found - open aes_wave.vcd with your waveform viewer"
+  echo "🛈 GTKWave not found. Open $SIM_DIR/aes_wave.vcd with your viewer."
 fi
+
+echo "✅ Simulation finished."
